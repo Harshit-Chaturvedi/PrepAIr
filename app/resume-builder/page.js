@@ -155,8 +155,19 @@ export default function ResumeBuilderPage() {
     if (enhanced.education?.length) {
       html += sectionHead('Education');
       enhanced.education.forEach(edu => {
-        html += `<p style="font-size: 9pt; margin: 0 0 2px;"><strong>${edu.degree}</strong> — ${edu.school}, ${edu.year}${edu.gpa ? ' | GPA: ' + edu.gpa : ''}${edu.honors ? ' | ' + edu.honors : ''}</p>`;
+        html += `<p style="font-size: 9pt; margin: 0 0 1px;"><strong>${edu.degree}</strong> — ${edu.school}, ${edu.year}${edu.gpa ? ' | GPA: ' + edu.gpa : ''}${edu.honors ? ' | ' + edu.honors : ''}</p>`;
+        if (edu.coursework) {
+          html += `<p style="font-size: 8.5pt; color: #555; margin: 0 0 2px;"><em>Relevant Coursework: ${edu.coursework}</em></p>`;
+        }
       });
+    }
+
+    // Achievements
+    if (enhanced.achievements?.length) {
+      html += sectionHead('Achievements');
+      html += `<ul style="margin: 1px 0 0 14px; padding: 0;">`;
+      enhanced.achievements.forEach(a => { html += `<li style="font-size: 9pt; margin-bottom: 1px;">${a}</li>`; });
+      html += `</ul>`;
     }
 
     // Certifications
@@ -439,8 +450,21 @@ export default function ResumeBuilderPage() {
                           <span style={{ fontSize: '0.68rem', color: 'var(--text-3)' }}>{edu.year}</span>
                         </div>
                         <span className="resume-text">{edu.school}{edu.gpa ? ` | GPA: ${edu.gpa}` : ''}{edu.honors ? ` | ${edu.honors}` : ''}</span>
+                        {edu.coursework && (
+                          <p style={{ fontSize: '0.72rem', color: 'var(--text-3)', fontStyle: 'italic', marginTop: 2 }}>Relevant Coursework: {edu.coursework}</p>
+                        )}
                       </div>
                     ))}
+                  </div>
+                )}
+
+                {/* Achievements */}
+                {enhanced.achievements?.length > 0 && (
+                  <div className="resume-section">
+                    <h4 className="resume-heading">Achievements</h4>
+                    <ul className="resume-bullets">
+                      {enhanced.achievements.map((a, i) => <li key={i}>{a}</li>)}
+                    </ul>
                   </div>
                 )}
 
