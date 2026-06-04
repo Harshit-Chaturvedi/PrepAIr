@@ -194,10 +194,14 @@ export default function ResumeBuilderPage() {
         }
       </style>
       </head><body>${html}
-      <script>window.onafterprint = function() { window.close(); };</script>
       </body></html>`);
     printWindow.document.close();
-    setTimeout(() => { printWindow.print(); }, 600);
+    
+    // Give fonts more time to load on slower mobile connections
+    setTimeout(() => { 
+      printWindow.focus();
+      printWindow.print(); 
+    }, 1000);
   };
 
   const downloadAsDOCX = () => {
