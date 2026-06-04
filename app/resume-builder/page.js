@@ -87,12 +87,12 @@ export default function ResumeBuilderPage() {
     const ff = forDocx ? 'Calibri, Arial, sans-serif' : "'Inter', Arial, sans-serif";
     const c = enhanced.contact || {};
     
-    let html = `<div style="font-family: ${ff}; color: #1a1a1a; width: 100%; box-sizing: border-box; padding: ${forDocx ? '12px 20px' : '18px 28px'}; font-size: 9.5pt; line-height: 1.4;">`;
+    let html = `<div style="font-family: ${ff}; color: #1a1a1a; width: 100%; box-sizing: border-box; padding: ${forDocx ? '10px 16px' : '12px 24px'}; font-size: 9pt; line-height: 1.35;">`;
     
     // Name & Contact Header
     if (enhanced.name) {
-      html += `<div style="text-align: center; margin-bottom: 6px;">
-        <h1 style="font-size: 18pt; font-weight: 700; margin: 0 0 3px; letter-spacing: 0.5px;">${enhanced.name}</h1>
+      html += `<div style="text-align: center; margin-bottom: 4px;">
+        <h1 style="font-size: 17pt; font-weight: 700; margin: 0 0 2px; letter-spacing: 0.5px;">${enhanced.name}</h1>
         <div style="font-size: 8.5pt; color: #555;">`;
       const parts = [];
       if (c.email) parts.push(c.email);
@@ -102,10 +102,10 @@ export default function ResumeBuilderPage() {
       if (c.github) parts.push(`<a href="${c.github}" style="color: #2563eb; text-decoration: none;">${c.github.replace(/https?:\/\/(www\.)?/, '')}</a>`);
       if (c.portfolio) parts.push(`<a href="${c.portfolio}" style="color: #2563eb; text-decoration: none;">${c.portfolio.replace(/https?:\/\/(www\.)?/, '')}</a>`);
       html += parts.join(' | ');
-      html += `</div></div><hr style="border: none; border-top: 1.5px solid #1a1a1a; margin: 0 0 8px;">`;
+      html += `</div></div><hr style="border: none; border-top: 1.5px solid #1a1a1a; margin: 0 0 6px;">`;
     }
     
-    const sectionHead = (title) => `<h2 style="font-size: 9.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #1a1a1a; margin: 8px 0 4px; padding-bottom: 2px; border-bottom: 0.5px solid #ccc;">${title}</h2>`;
+    const sectionHead = (title) => `<h2 style="font-size: 9.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #1a1a1a; margin: 6px 0 3px; padding-bottom: 1px; border-bottom: 0.5px solid #ccc;">${title}</h2>`;
 
     // Summary
     if (enhanced.summary) {
@@ -116,13 +116,13 @@ export default function ResumeBuilderPage() {
     if (enhanced.experience?.length) {
       html += sectionHead('Experience');
       enhanced.experience.forEach(exp => {
-        html += `<div style="margin-bottom: 6px;">
+        html += `<div style="margin-bottom: 4px;">
           <div style="display: flex; justify-content: space-between; align-items: baseline;">
             <span style="font-size: 9.5pt; font-weight: 700;">${exp.role} | <span style="font-weight: 400; font-style: italic;">${exp.company}</span></span>
             <span style="font-size: 8pt; color: #777;">${exp.duration}</span>
           </div>
           <ul style="margin: 1px 0 0 14px; padding: 0;">`;
-        exp.bullets?.forEach(b => { html += `<li style="font-size: 9pt; margin-bottom: 1px;">${b}</li>`; });
+        exp.bullets?.forEach(b => { html += `<li style="font-size: 9pt; margin-bottom: 0;">${b}</li>`; });
         html += `</ul></div>`;
       });
     }
@@ -131,11 +131,11 @@ export default function ResumeBuilderPage() {
     if (enhanced.projects?.length) {
       html += sectionHead('Projects');
       enhanced.projects.forEach(proj => {
-        html += `<div style="margin-bottom: 6px;">
+        html += `<div style="margin-bottom: 4px;">
           <span style="font-size: 9.5pt; font-weight: 700;">${proj.name}</span>
           <span style="font-size: 8.5pt; color: #777; margin-left: 4px;">| ${proj.tech}</span>
           <ul style="margin: 1px 0 0 14px; padding: 0;">`;
-        proj.bullets?.forEach(b => { html += `<li style="font-size: 9pt; margin-bottom: 1px;">${b}</li>`; });
+        proj.bullets?.forEach(b => { html += `<li style="font-size: 9pt; margin-bottom: 0;">${b}</li>`; });
         html += `</ul></div>`;
       });
     }
@@ -157,7 +157,8 @@ export default function ResumeBuilderPage() {
       enhanced.education.forEach(edu => {
         html += `<p style="font-size: 9pt; margin: 0 0 1px;"><strong>${edu.degree}</strong> — ${edu.school}, ${edu.year}${edu.gpa ? ' | GPA: ' + edu.gpa : ''}${edu.honors ? ' | ' + edu.honors : ''}</p>`;
         if (edu.coursework) {
-          html += `<p style="font-size: 8.5pt; color: #555; margin: 0 0 2px;"><em>Relevant Coursework: ${edu.coursework}</em></p>`;
+          const cw = edu.coursework.replace(/^Relevant Coursework:\s*/i, '');
+          html += `<p style="font-size: 8.5pt; color: #555; margin: 0 0 2px;"><em>Relevant Coursework: ${cw}</em></p>`;
         }
       });
     }
@@ -166,7 +167,7 @@ export default function ResumeBuilderPage() {
     if (enhanced.achievements?.length) {
       html += sectionHead('Achievements');
       html += `<ul style="margin: 1px 0 0 14px; padding: 0;">`;
-      enhanced.achievements.forEach(a => { html += `<li style="font-size: 9pt; margin-bottom: 1px;">${a}</li>`; });
+      enhanced.achievements.forEach(a => { html += `<li style="font-size: 9pt; margin-bottom: 0;">${a}</li>`; });
       html += `</ul>`;
     }
 
@@ -323,7 +324,7 @@ export default function ResumeBuilderPage() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: (enhanced.atsScore || 85) >= 80 ? 'var(--green)' : 'var(--amber)' }}>{enhanced.atsScore || 85}</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: (enhanced.atsScore || 0) >= 80 ? 'var(--green)' : 'var(--amber)' }}>{enhanced.atsScore || 'N/A'}</div>
                 <div style={{ fontSize: '0.62rem', color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 1 }}>ATS Score</div>
               </div>
             </div>
@@ -451,7 +452,7 @@ export default function ResumeBuilderPage() {
                         </div>
                         <span className="resume-text">{edu.school}{edu.gpa ? ` | GPA: ${edu.gpa}` : ''}{edu.honors ? ` | ${edu.honors}` : ''}</span>
                         {edu.coursework && (
-                          <p style={{ fontSize: '0.72rem', color: 'var(--text-3)', fontStyle: 'italic', marginTop: 2 }}>Relevant Coursework: {edu.coursework}</p>
+                          <p style={{ fontSize: '0.72rem', color: 'var(--text-3)', fontStyle: 'italic', marginTop: 2 }}>Relevant Coursework: {edu.coursework.replace(/^Relevant Coursework:\s*/i, '')}</p>
                         )}
                       </div>
                     ))}
