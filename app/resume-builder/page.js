@@ -87,7 +87,7 @@ export default function ResumeBuilderPage() {
     const ff = forDocx ? 'Calibri, Arial, sans-serif' : "'Inter', Arial, sans-serif";
     const c = enhanced.contact || {};
     
-    let html = `<div style="font-family: ${ff}; color: #1a1a1a; width: 100%; box-sizing: border-box; padding: ${forDocx ? '12px 20px' : '20px 32px'}; font-size: 9.5pt; line-height: 1.45; min-height: ${forDocx ? 'auto' : '100vh'}; display: flex; flex-direction: column;">`;
+    let html = `<div style="font-family: ${ff}; color: #1a1a1a; width: 100%; box-sizing: border-box; padding: ${forDocx ? '12px 20px' : '18px 28px'}; font-size: 9.5pt; line-height: 1.4;">`;
     
     // Name & Contact Header
     if (enhanced.name) {
@@ -176,22 +176,18 @@ export default function ResumeBuilderPage() {
     printWindow.document.write(`<!DOCTYPE html><html><head><title> </title>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
       <style>
-        * { box-sizing: border-box; }
-        html, body { margin: 0; padding: 0; height: 100%; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { margin: 0; padding: 0; }
         @page {
           size: A4;
-          margin: 0.35in 0.4in;
+          margin: 0.4in 0.45in;
         }
         body {
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
-          height: 100%;
         }
-        /* Make the resume fill the full page */
-        body > div {
-          min-height: calc(297mm - 0.7in);
-          justify-content: space-between;
-        }
+        h1, h2, p, ul, li { margin: 0; padding: 0; }
+        ul { list-style-position: outside; padding-left: 14px; }
       </style>
       </head><body>${html}
       </body></html>`);
