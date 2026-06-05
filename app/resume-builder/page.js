@@ -87,13 +87,13 @@ export default function ResumeBuilderPage() {
     const ff = forDocx ? 'Calibri, Arial, sans-serif' : "'Inter', Arial, sans-serif";
     const c = enhanced.contact || {};
     
-    let html = `<div style="font-family: ${ff}; color: #1a1a1a; width: 100%; box-sizing: border-box; padding: ${forDocx ? '10px 16px' : '12px 24px'}; font-size: 9pt; line-height: 1.35;">`;
+    let html = `<div style="font-family: ${ff}; color: #1a1a1a; width: 100%; box-sizing: border-box; padding: ${forDocx ? '8px 12px' : '10px 20px'}; font-size: 9pt; line-height: 1.3;">`; 
     
     // Name & Contact Header
     if (enhanced.name) {
-      html += `<div style="text-align: center; margin-bottom: 4px;">
-        <h1 style="font-size: 17pt; font-weight: 700; margin: 0 0 2px; letter-spacing: 0.5px;">${enhanced.name}</h1>
-        <div style="font-size: 8.5pt; color: #555;">`;
+      html += `<div style="text-align: center; margin-bottom: 3px;">
+        <h1 style="font-size: 16pt; font-weight: 800; margin: 0 0 2px; letter-spacing: 0.5px;">${enhanced.name}</h1>
+        <div style="font-size: 8pt; color: #555;">`;
       const parts = [];
       if (c.email) parts.push(c.email);
       if (c.phone) parts.push(c.phone);
@@ -102,10 +102,10 @@ export default function ResumeBuilderPage() {
       if (c.github) parts.push(`<a href="${c.github}" style="color: #2563eb; text-decoration: none;">${c.github.replace(/https?:\/\/(www\.)?/, '')}</a>`);
       if (c.portfolio) parts.push(`<a href="${c.portfolio}" style="color: #2563eb; text-decoration: none;">${c.portfolio.replace(/https?:\/\/(www\.)?/, '')}</a>`);
       html += parts.join(' | ');
-      html += `</div></div><hr style="border: none; border-top: 1.5px solid #1a1a1a; margin: 0 0 6px;">`;
+      html += `</div></div><hr style="border: none; border-top: 1.5px solid #1a1a1a; margin: 0 0 4px;">`;
     }
     
-    const sectionHead = (title) => `<h2 style="font-size: 9.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #1a1a1a; margin: 6px 0 3px; padding-bottom: 1px; border-bottom: 0.5px solid #ccc;">${title}</h2>`;
+    const sectionHead = (title) => `<h2 style="font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #1a1a1a; margin: 6px 0 2px; padding-bottom: 1px; border-bottom: 0.5px solid #ccc;">${title}</h2>`;
 
     // Summary
     if (enhanced.summary) {
@@ -133,7 +133,7 @@ export default function ResumeBuilderPage() {
       enhanced.projects.forEach(proj => {
         html += `<div style="margin-bottom: 4px;">
           <span style="font-size: 9.5pt; font-weight: 700;">${proj.name}</span>
-          <span style="font-size: 8.5pt; color: #777; margin-left: 4px;">| ${proj.tech}</span>
+          <span style="font-size: 8.5pt; color: #777; margin-left: 4px;">| ${typeof proj.tech === 'object' ? (Array.isArray(proj.tech) ? proj.tech.join(', ') : Object.values(proj.tech).flat().join(', ')) : (proj.tech || '')}</span>
           <ul style="margin: 1px 0 0 14px; padding: 0;">`;
         proj.bullets?.forEach(b => { html += `<li style="font-size: 9pt; margin-bottom: 0;">${b}</li>`; });
         html += `</ul></div>`;
@@ -157,76 +157,92 @@ export default function ResumeBuilderPage() {
       enhanced.education.forEach(edu => {
         html += `<p style="font-size: 9pt; margin: 0 0 1px;"><strong>${edu.degree}</strong> — ${edu.school}, ${edu.year}${edu.gpa ? ' | GPA: ' + edu.gpa : ''}${edu.honors ? ' | ' + edu.honors : ''}</p>`;
         if (edu.coursework) {
-          const cw = edu.coursework.replace(/^Relevant Coursework:\s*/i, '');
-          html += `<p style="font-size: 8.5pt; color: #555; margin: 0 0 2px;"><em>Relevant Coursework: ${cw}</em></p>`;
+          const cw = typeof edu.coursework === 'string' ? edu.coursework.replace(/^Relevant Coursework:\s*/i, '') : (typeof edu.coursework === 'object' ? (Array.isArray(edu.coursework) ? edu.coursework.join(', ') : Object.values(edu.coursework).flat().join(', ')) : '');
+          html += `<p style="font-size: 8.5pt; color: #555; margin: 0 0 2px;"><em>Relevant Coursework:</em> ${cw}</p>`;
         }
       });
     }
-
+    
     // Achievements
     if (enhanced.achievements?.length) {
       html += sectionHead('Achievements');
       html += `<ul style="margin: 1px 0 0 14px; padding: 0;">`;
-      enhanced.achievements.forEach(a => { html += `<li style="font-size: 9pt; margin-bottom: 0;">${a}</li>`; });
+      enhanced.achievements.forEach(ach => {
+        html += `<li style="font-size: 9pt; margin-bottom: 0;">${ach}</li>`;
+      });
       html += `</ul>`;
     }
-
+    
     // Certifications
     if (enhanced.certifications?.length) {
       html += sectionHead('Certifications');
-      html += `<p style="font-size: 9pt; margin: 0;">${enhanced.certifications.join(' • ')}</p>`;
+      html += `<ul style="margin: 1px 0 0 14px; padding: 0;">`;
+      enhanced.certifications.forEach(cert => {
+        html += `<li style="font-size: 9pt; margin-bottom: 1px;">${cert}</li>`;
+      });
+      html += `</ul>`;
     }
     
     html += `</div>`;
     return html;
   };
-
-  const downloadAsPDF = () => {
+  const downloadAsPDF = async () => {
     if (!enhanced) return;
-    const html = buildResumeHTML();
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`<!DOCTYPE html><html><head><title> </title>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-      <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { margin: 0; padding: 0; }
-        @page {
-          size: A4;
-          margin: 0.4in 0.45in;
-        }
-        body {
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-        h1, h2, p, ul, li { margin: 0; padding: 0; }
-        ul { list-style-position: outside; padding-left: 14px; }
-      </style>
-      </head><body>${html}
-      </body></html>`);
-    printWindow.document.close();
+    const html = buildResumeHTML(false);
     
-    // Give fonts more time to load on slower mobile connections
-    setTimeout(() => { 
-      printWindow.focus();
-      printWindow.print(); 
-    }, 1000);
+    try {
+      const btn = document.getElementById('pdf-download-btn');
+      const oldText = btn ? btn.innerText : '';
+      if (btn) btn.innerText = 'Generating PDF...';
+
+      const res = await fetch('/api/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html, title: enhanced.name || 'Enhanced' })
+      });
+      
+      if (!res.ok) throw new Error('Failed to generate PDF');
+      
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${(enhanced.name || 'enhanced').replace(/\s+/g, '_')}_resume.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      if (btn) btn.innerText = oldText;
+    } catch (err) {
+      alert('Error downloading PDF: ' + err.message);
+      const btn = document.getElementById('pdf-download-btn');
+      if (btn) btn.innerText = 'Download PDF';
+    }
   };
 
-  const downloadAsDOCX = () => {
+  const downloadAsDOCX = async () => {
     if (!enhanced) return;
     const html = buildResumeHTML(true);
-    const docContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-      <head><meta charset="utf-8"><title>${enhanced.name || 'Enhanced'} Resume</title>
-      <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->
-      <style>@page { size: A4; margin: 1in; } body { font-family: Calibri, sans-serif; }</style>
-      </head><body>${html}</body></html>`;
-    const blob = new Blob(['\ufeff', docContent], { type: 'application/msword' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${(enhanced.name || 'enhanced').replace(/\s+/g, '_')}_resume.doc`;
-    a.click();
-    URL.revokeObjectURL(url);
+    
+    try {
+      // Optional: add loading state here if desired
+      const res = await fetch('/api/generate-docx', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html, title: enhanced.name || 'Enhanced' })
+      });
+      
+      if (!res.ok) throw new Error('Failed to generate DOCX');
+      
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${(enhanced.name || 'enhanced').replace(/\s+/g, '_')}_resume.docx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Error downloading DOCX: ' + err.message);
+    }
   };
 
   // Decorative illustrations
@@ -303,7 +319,7 @@ export default function ResumeBuilderPage() {
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
                 Start Over
               </button>
-              <button className="btn btn-primary" onClick={downloadAsPDF} style={{ fontSize: '0.76rem' }}>
+              <button id="pdf-download-btn" className="btn btn-primary" onClick={downloadAsPDF} style={{ fontSize: '0.76rem' }}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Download PDF
               </button>
@@ -415,7 +431,9 @@ export default function ResumeBuilderPage() {
                       <div key={i} style={{ marginBottom: 14 }}>
                         <div style={{ marginBottom: 4 }}>
                           <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>{proj.name}</span>
-                          <span style={{ fontSize: '0.72rem', color: 'var(--text-3)', marginLeft: 6 }}>{proj.tech}</span>
+                          <span style={{ fontSize: '0.72rem', color: 'var(--text-3)', marginLeft: 6 }}>
+                            {typeof proj.tech === 'string' ? proj.tech : (typeof proj.tech === 'object' && proj.tech ? (Array.isArray(proj.tech) ? proj.tech.join(', ') : Object.values(proj.tech).flat().join(', ')) : '')}
+                          </span>
                         </div>
                         <ul className="resume-bullets">
                           {proj.bullets?.map((b, j) => <li key={j}>{b}</li>)}
@@ -452,7 +470,7 @@ export default function ResumeBuilderPage() {
                         </div>
                         <span className="resume-text">{edu.school}{edu.gpa ? ` | GPA: ${edu.gpa}` : ''}{edu.honors ? ` | ${edu.honors}` : ''}</span>
                         {edu.coursework && (
-                          <p style={{ fontSize: '0.72rem', color: 'var(--text-3)', fontStyle: 'italic', marginTop: 2 }}>Relevant Coursework: {edu.coursework.replace(/^Relevant Coursework:\s*/i, '')}</p>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-2)', marginTop: 2, fontStyle: 'italic' }}>Relevant Coursework: {typeof edu.coursework === 'string' ? edu.coursework.replace(/^Relevant Coursework:\s*/i, '') : (typeof edu.coursework === 'object' && edu.coursework ? (Array.isArray(edu.coursework) ? edu.coursework.join(', ') : Object.values(edu.coursework).flat().join(', ')) : '')}</div>
                         )}
                       </div>
                     ))}
