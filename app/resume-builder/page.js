@@ -195,22 +195,31 @@ export default function ResumeBuilderPage() {
       const oldText = btn ? btn.innerText : '';
       if (btn) btn.innerText = 'Generating PDF...';
 
-      const res = await fetch('/api/generate-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ html, title: enhanced.name || 'Enhanced' })
-      });
+      const html2pdf = (await import('html2pdf.js')).default;
       
-      if (!res.ok) throw new Error('Failed to generate PDF');
-      
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${(enhanced.name || 'enhanced').replace(/\s+/g, '_')}_resume.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
+      const container = document.createElement('div');
+      container.innerHTML = `
+        <div style="width: 210mm; padding: 0;">
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+          ${html}
+        </div>
+      `;
+      container.style.position = 'fixed';
+      container.style.left = '-9999px';
+      document.body.appendChild(container);
 
+      await new Promise(r => setTimeout(r, 300));
+
+      await html2pdf().set({
+        margin: [0.2, 0.2, 0.2, 0.2],
+        filename: `${(enhanced.name || 'enhanced').replace(/\s+/g, '_')}_resume.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all'] }
+      }).from(container.firstElementChild).save();
+
+      document.body.removeChild(container);
       if (btn) btn.innerText = oldText;
     } catch (err) {
       alert('Error downloading PDF: ' + err.message);
@@ -248,50 +257,143 @@ export default function ResumeBuilderPage() {
   // Decorative illustrations
   const Illustrations = () => (
     <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-      <img src="/resume-transform.png" alt="" style={{ position: 'absolute', top: '10%', right: '-3%', width: 280, opacity: 0.08, transform: 'rotate(8deg)' }} />
-      <img src="/resume-analysis.png" alt="" style={{ position: 'absolute', bottom: '5%', left: '-2%', width: 240, opacity: 0.06, transform: 'rotate(-5deg)' }} />
+      <img src="/resume-transform.png" alt="" style={{ position: 'absolute', top: '10%', right: '-3%', width: 280, opacity: 0.02, transform: 'rotate(8deg)' }} />
+      <img src="/resume-analysis.png" alt="" style={{ position: 'absolute', bottom: '5%', left: '-2%', width: 240, opacity: 0.02, transform: 'rotate(-5deg)' }} />
     </div>
   );
 
   // --- ENHANCING STATE ---
   if (step === 'enhancing') {
     const steps = [
-      { label: 'Analyzing current resume', icon: '🔍' },
-      { label: 'Rewriting with STAR method', icon: '✍️' },
-      { label: 'Optimizing for ATS scanners', icon: '🤖' },
-      { label: 'Generating final format', icon: '✨' },
+      { label: 'Analyzing current skills & experience', icon: '🔍' },
+      { label: 'Rewriting achievements with STAR method', icon: '✍️' },
+      { label: 'Injecting high-impact target keywords', icon: '🤖' },
+      { label: 'Re-calculating final ATS criteria scores', icon: '✨' },
     ];
     return (
       <div className="page-bg-wrap">
         <div className="page-bg"><div className="orb" /><div className="orb" /><div className="orb" /></div>
         <Illustrations />
-        <div className="page-content" style={{ maxWidth: 560, margin: '0 auto', padding: '120px 24px', textAlign: 'center' }}>
-          <div className="pulse-ring" style={{ width: 80, height: 80, margin: '0 auto 28px', position: 'relative' }}>
-            <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, var(--purple), var(--blue))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, position: 'relative', zIndex: 1 }}>📝</div>
-          </div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 8 }}>Transforming your resume...</h2>
-          <p style={{ fontSize: '0.88rem', color: 'var(--text-2)', lineHeight: 1.6, marginBottom: 36 }}>
-            AI is rewriting every section with quantified achievements<br/>and ATS-optimized keywords.
-          </p>
-          <div style={{ textAlign: 'left', maxWidth: 340, margin: '0 auto' }}>
-            {steps.map((s, i) => (
-              <div key={i} style={{
-                display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0',
-                opacity: i <= enhanceStep ? 1 : 0.35,
-                transition: 'all 0.5s ease',
-                transform: i <= enhanceStep ? 'translateX(0)' : 'translateX(-10px)',
-              }}>
-                <span style={{ fontSize: 18, width: 28, textAlign: 'center' }}>
-                  {i < enhanceStep ? '✅' : i === enhanceStep ? <span className="spin" style={{ display: 'inline-block' }}>⟳</span> : s.icon}
-                </span>
-                <span style={{ fontSize: '0.85rem', fontWeight: i === enhanceStep ? 600 : 400 }}>{s.label}</span>
+        <div className="page-content" style={{ maxWidth: 840, margin: '0 auto', padding: '80px 24px', animation: 'fadeInUp 0.6s ease' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 48, alignItems: 'center' }} className="hero-grid">
+            
+            {/* Left: Steps Progress */}
+            <div>
+              <div className="pulse-ring" style={{ width: 64, height: 64, marginBottom: 24, position: 'relative', borderRadius: '50%' }}>
+                <div style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.02)',
+                  border: '1px solid var(--border)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  zIndex: 1,
+                  padding: 10,
+                  animation: 'pulse 1.5s infinite alternate ease-in-out',
+                }}>
+                  <img src="/logo-mark.png" alt="PrepAIr Mark" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                </div>
               </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 32 }}>
-            <div style={{ height: 4, background: 'var(--surface-2)', borderRadius: 4, overflow: 'hidden' }}>
-              <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--purple), var(--blue))', borderRadius: 4, width: `${((enhanceStep + 1) / 4) * 100}%`, transition: 'width 1s ease' }} />
+              <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: 12, letterSpacing: '-0.02em' }}>Optimizing Your Resume</h2>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-2)', lineHeight: 1.6, marginBottom: 32 }}>
+                Gemini AI is analyzing skill gaps, applying corporate STAR formatting, and structuring keywords to maximize interview success.
+              </p>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {steps.map((s, i) => (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px',
+                    background: i === enhanceStep ? 'rgba(255,255,255,0.02)' : 'transparent',
+                    border: i === enhanceStep ? '1px solid var(--border)' : '1px solid transparent',
+                    borderRadius: 'var(--radius)',
+                    opacity: i <= enhanceStep ? 1 : 0.35,
+                    transition: 'all 0.4s ease',
+                  }}>
+                    <span style={{ fontSize: 16, width: 24, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      {i < enhanceStep ? (
+                        <span style={{ color: 'var(--green)', fontWeight: 'bold' }}>✓</span>
+                      ) : i === enhanceStep ? (
+                        <svg className="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="3"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                      ) : (
+                        <span style={{ filter: 'grayscale(1)' }}>{s.icon}</span>
+                      )}
+                    </span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: i === enhanceStep ? 600 : 400, color: i === enhanceStep ? 'var(--text)' : 'var(--text-2)' }}>{s.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            {/* Right: Shimmering Resume Skeleton */}
+            <div className="card" style={{ padding: '24px 20px', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border)', overflow: 'hidden' }}>
+              <div style={{
+                background: '#ffffff',
+                padding: '24px 20px',
+                borderRadius: '4px',
+                minHeight: '380px',
+                opacity: 0.9,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
+                boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
+              }}>
+                {/* Header Skeleton */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <div className="shimmer" style={{ width: 110, height: 12, borderRadius: 2 }} />
+                  <div className="shimmer" style={{ width: 170, height: 7, borderRadius: 2 }} />
+                </div>
+                
+                {/* Summary */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div className="shimmer" style={{ width: 50, height: 8, borderRadius: 2, background: 'rgba(59, 130, 246, 0.25)' }} />
+                  <div className="shimmer" style={{ width: '95%', height: 5, borderRadius: 2 }} />
+                  <div className="shimmer" style={{ width: '85%', height: 5, borderRadius: 2 }} />
+                </div>
+                
+                {/* Experience section */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div className="shimmer" style={{ width: 70, height: 8, borderRadius: 2, background: 'rgba(59, 130, 246, 0.25)' }} />
+                  
+                  {/* Bullet line 1 (glows purple when STAR rewriting is running) */}
+                  <div style={{
+                    borderLeft: enhanceStep >= 1 ? '2px solid var(--purple)' : '2px solid #eee',
+                    paddingLeft: 8,
+                    transition: 'all 0.5s ease',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 5,
+                  }}>
+                    <div className="shimmer" style={{ width: '92%', height: 5, borderRadius: 2, background: enhanceStep >= 1 ? 'rgba(99, 102, 241, 0.12)' : undefined }} />
+                    <div className="shimmer" style={{ width: '70%', height: 5, borderRadius: 2, background: enhanceStep >= 1 ? 'rgba(99, 102, 241, 0.12)' : undefined }} />
+                  </div>
+                  
+                  {/* Bullet line 2 (glows blue when keyword insertion runs) */}
+                  <div style={{
+                    borderLeft: enhanceStep >= 2 ? '2px solid #2563EB' : '2px solid #eee',
+                    paddingLeft: 8,
+                    transition: 'all 0.5s ease',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 5,
+                    marginTop: 2,
+                  }}>
+                    <div className="shimmer" style={{ width: '96%', height: 5, borderRadius: 2, background: enhanceStep >= 2 ? 'rgba(37, 99, 235, 0.12)' : undefined }} />
+                    <div className="shimmer" style={{ width: '80%', height: 5, borderRadius: 2, background: enhanceStep >= 2 ? 'rgba(37, 99, 235, 0.12)' : undefined }} />
+                  </div>
+                </div>
+                
+                {/* Section 3 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 2 }}>
+                  <div className="shimmer" style={{ width: 60, height: 8, borderRadius: 2, background: 'rgba(59, 130, 246, 0.25)' }} />
+                  <div className="shimmer" style={{ width: '90%', height: 5, borderRadius: 2 }} />
+                </div>
+
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -310,9 +412,8 @@ export default function ResumeBuilderPage() {
         <div className="page-content" style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px 64px' }}>
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
-            <a href="/" className="brand">
-              <div className="brand-mark" style={{ width: 28, height: 28, borderRadius: 8 }}><svg viewBox="0 0 24 24" style={{ width: 14, height: 14 }}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-              <span className="brand-name" style={{ fontSize: '1.05rem' }}>PrepAIr</span>
+            <a href="/" style={{ display: 'flex', alignItems: 'center' }}>
+              <img src="/logo.png" alt="PrepAIr Logo" style={{ height: 32, width: 'auto' }} />
             </a>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <button className="btn btn-outline" onClick={() => { setStep('upload'); setEnhanced(null); }} style={{ fontSize: '0.76rem' }}>
@@ -331,17 +432,17 @@ export default function ResumeBuilderPage() {
           </div>
 
           {/* ATS Score Banner */}
-          <div className="card" style={{ padding: '20px 28px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, background: 'linear-gradient(135deg, rgba(34,197,94,0.06), rgba(59,130,246,0.06))', border: '1px solid rgba(34,197,94,0.15)' }}>
+          <div className="card" style={{ padding: '20px 28px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, borderLeft: '4px solid var(--green)' }}>
             <div>
-              <h2 style={{ fontSize: '1.3rem', fontWeight: 700 }}>
+              <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text)' }}>
                 {enhanced.name ? `${enhanced.name}'s Enhanced Resume` : 'Enhanced Resume'}
               </h2>
-              <p style={{ fontSize: '0.82rem', color: 'var(--text-2)', marginTop: 2 }}>Optimized for {targetTier} • {targetRole || 'Software Engineer'}</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-2)', marginTop: 2 }}>Optimized for {targetTier} • {targetRole || 'Software Engineer'}</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: (enhanced.atsScore || 0) >= 80 ? 'var(--green)' : 'var(--amber)' }}>{enhanced.atsScore || 'N/A'}</div>
-                <div style={{ fontSize: '0.62rem', color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 1 }}>ATS Score</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: (enhanced.atsScore || 0) >= 80 ? 'var(--green)' : 'var(--amber)', lineHeight: 1.1 }}>{enhanced.atsScore || 'N/A'}</div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 1, marginTop: 2 }}>ATS Score</div>
               </div>
             </div>
           </div>
@@ -363,139 +464,160 @@ export default function ResumeBuilderPage() {
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
               <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--green)' }} />
-                <span className="field-label">Enhanced Resume</span>
+                <span className="field-label">Enhanced Resume (A4 Print Preview)</span>
               </div>
-              <div style={{ padding: 24, maxHeight: 700, overflow: 'auto' }}>
-                {/* Name & Contact */}
-                {enhanced.name && (
-                  <div style={{ textAlign: 'center', marginBottom: 16, paddingBottom: 14, borderBottom: '2px solid var(--text)' }}>
-                    <h2 style={{ fontSize: '1.35rem', fontWeight: 800, letterSpacing: '-0.01em', marginBottom: 6 }}>{enhanced.name}</h2>
-                    <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 6, fontSize: '0.72rem', color: 'var(--text-2)' }}>
-                      {c.email && <span>{c.email}</span>}
-                      {c.email && (c.phone || c.location || hasLinks) && <span style={{ color: 'var(--text-3)' }}>•</span>}
-                      {c.phone && <span>{c.phone}</span>}
-                      {c.phone && (c.location || hasLinks) && <span style={{ color: 'var(--text-3)' }}>•</span>}
-                      {c.location && <span>{c.location}</span>}
+              <div style={{ padding: '24px 16px', maxHeight: 700, overflow: 'auto', background: '#090a0e', display: 'flex', justifyContent: 'center' }}>
+                <div style={{
+                  background: '#ffffff',
+                  color: '#1a1a1a',
+                  padding: '40px 32px',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                  borderRadius: '2px',
+                  fontFamily: "'Inter', sans-serif",
+                  width: '100%',
+                  minHeight: '800px',
+                  boxSizing: 'border-box',
+                }}>
+                  {/* Name & Contact */}
+                  {enhanced.name && (
+                    <div style={{ textAlign: 'center', marginBottom: 12 }}>
+                      <h1 style={{ fontSize: '16pt', fontWeight: 800, margin: '0 0 2px', color: '#1a1a1a', letterSpacing: '0.5px' }}>{enhanced.name}</h1>
+                      <div style={{ fontSize: '8.5pt', color: '#555', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 6 }}>
+                        {c.email && <span>{c.email}</span>}
+                        {c.email && (c.phone || c.location || hasLinks) && <span>|</span>}
+                        {c.phone && <span>{c.phone}</span>}
+                        {c.phone && (c.location || hasLinks) && <span>|</span>}
+                        {c.location && <span>{c.location}</span>}
+                      </div>
+                      {hasLinks && (
+                        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 10, marginTop: 4, fontSize: '8.5pt' }}>
+                          {c.linkedin && <a href={c.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', textDecoration: 'none' }}>LinkedIn</a>}
+                          {c.linkedin && (c.github || c.portfolio) && <span style={{ color: '#555' }}>|</span>}
+                          {c.github && <a href={c.github} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', textDecoration: 'none' }}>GitHub</a>}
+                          {c.github && c.portfolio && <span style={{ color: '#555' }}>|</span>}
+                          {c.portfolio && <a href={c.portfolio} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', textDecoration: 'none' }}>Portfolio</a>}
+                        </div>
+                      )}
+                      <hr style={{ border: 'none', borderTop: '1.5px solid #1a1a1a', margin: '8px 0 4px' }} />
                     </div>
-                    {hasLinks && (
-                      <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 10, marginTop: 5, fontSize: '0.72rem' }}>
-                        {c.linkedin && <a href={c.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                          LinkedIn
-                        </a>}
-                        {c.github && <a href={c.github} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                          GitHub
-                        </a>}
-                        {c.portfolio && <a href={c.portfolio} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                          Portfolio
-                        </a>}
-                      </div>
-                    )}
-                  </div>
-                )}
+                  )}
 
-                {/* Summary */}
-                {enhanced.summary && (
-                  <div className="resume-section">
-                    <h4 className="resume-heading">Summary</h4>
-                    <p className="resume-text">{enhanced.summary}</p>
-                  </div>
-                )}
+                  {/* Summary */}
+                  {enhanced.summary && (
+                    <div style={{ marginBottom: 10 }}>
+                      <h2 style={{ fontSize: '9pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#1a1a1a', margin: '8px 0 3px', paddingBottom: '1px', borderBottom: '0.5px solid #ccc' }}>Summary</h2>
+                      <p style={{ fontSize: '9pt', color: '#333', margin: 0, lineHeight: 1.35 }}>{enhanced.summary}</p>
+                    </div>
+                  )}
 
-                {/* Experience */}
-                {enhanced.experience?.length > 0 && (
-                  <div className="resume-section">
-                    <h4 className="resume-heading">Experience</h4>
-                    {enhanced.experience.map((exp, i) => (
-                      <div key={i} style={{ marginBottom: 14 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
-                          <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>{exp.role}</span>
-                          <span style={{ fontSize: '0.68rem', color: 'var(--text-3)', whiteSpace: 'nowrap' }}>{exp.duration}</span>
+                  {/* Experience */}
+                  {enhanced.experience?.length > 0 && (
+                    <div style={{ marginBottom: 10 }}>
+                      <h2 style={{ fontSize: '9pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#1a1a1a', margin: '8px 0 3px', paddingBottom: '1px', borderBottom: '0.5px solid #ccc' }}>Experience</h2>
+                      {enhanced.experience.map((exp, i) => (
+                        <div key={i} style={{ marginBottom: 6 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                            <span style={{ fontSize: '9.5pt', fontWeight: 700, color: '#1a1a1a' }}>
+                              {exp.role} | <span style={{ fontWeight: 400, fontStyle: 'italic' }}>{exp.company}</span>
+                            </span>
+                            <span style={{ fontSize: '8pt', color: '#777' }}>{exp.duration}</span>
+                          </div>
+                          <ul style={{ margin: '1px 0 0 16px', padding: 0, color: '#333' }}>
+                            {exp.bullets?.map((b, j) => (
+                              <li key={j} style={{ fontSize: '9pt', marginBottom: '1px', listStyleType: 'disc', color: '#333' }}>{b}</li>
+                            ))}
+                          </ul>
                         </div>
-                        <div style={{ fontSize: '0.76rem', color: 'var(--text-2)', fontStyle: 'italic', marginBottom: 4 }}>{exp.company}</div>
-                        <ul className="resume-bullets">
-                          {exp.bullets?.map((b, j) => <li key={j}>{b}</li>)}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
 
-                {/* Projects */}
-                {enhanced.projects?.length > 0 && (
-                  <div className="resume-section">
-                    <h4 className="resume-heading">Projects</h4>
-                    {enhanced.projects.map((proj, i) => (
-                      <div key={i} style={{ marginBottom: 14 }}>
-                        <div style={{ marginBottom: 4 }}>
-                          <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>{proj.name}</span>
-                          <span style={{ fontSize: '0.72rem', color: 'var(--text-3)', marginLeft: 6 }}>
-                            {typeof proj.tech === 'string' ? proj.tech : (typeof proj.tech === 'object' && proj.tech ? (Array.isArray(proj.tech) ? proj.tech.join(', ') : Object.values(proj.tech).flat().join(', ')) : '')}
-                          </span>
+                  {/* Projects */}
+                  {enhanced.projects?.length > 0 && (
+                    <div style={{ marginBottom: 10 }}>
+                      <h2 style={{ fontSize: '9pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#1a1a1a', margin: '8px 0 3px', paddingBottom: '1px', borderBottom: '0.5px solid #ccc' }}>Projects</h2>
+                      {enhanced.projects.map((proj, i) => (
+                        <div key={i} style={{ marginBottom: 6 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                            <span style={{ fontSize: '9.5pt', fontWeight: 700, color: '#1a1a1a' }}>
+                              {proj.name} <span style={{ fontSize: '8.5pt', color: '#777', fontWeight: 400 }}>| {typeof proj.tech === 'object' ? (Array.isArray(proj.tech) ? proj.tech.join(', ') : Object.values(proj.tech).flat().join(', ')) : (proj.tech || '')}</span>
+                            </span>
+                          </div>
+                          <ul style={{ margin: '1px 0 0 16px', padding: 0, color: '#333' }}>
+                            {proj.bullets?.map((b, j) => (
+                              <li key={j} style={{ fontSize: '9pt', marginBottom: '1px', listStyleType: 'disc', color: '#333' }}>{b}</li>
+                            ))}
+                          </ul>
                         </div>
-                        <ul className="resume-bullets">
-                          {proj.bullets?.map((b, j) => <li key={j}>{b}</li>)}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
 
-                {/* Skills */}
-                {hasSkills && (
-                  <div className="resume-section">
-                    <h4 className="resume-heading">Technical Skills</h4>
-                    {Object.entries(enhanced.skills).map(([cat, items]) => (
-                      items?.length > 0 && (
-                        <div key={cat} style={{ marginBottom: 5 }}>
-                          <span style={{ fontSize: '0.78rem', fontWeight: 600, textTransform: 'capitalize' }}>{cat}: </span>
-                          <span className="resume-text">{items.join(', ')}</span>
+                  {/* Skills */}
+                  {hasSkills && (
+                    <div style={{ marginBottom: 10 }}>
+                      <h2 style={{ fontSize: '9pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#1a1a1a', margin: '8px 0 3px', paddingBottom: '1px', borderBottom: '0.5px solid #ccc' }}>Technical Skills</h2>
+                      {Object.entries(enhanced.skills).map(([cat, items]) => (
+                        items?.length > 0 && (
+                          <p key={cat} style={{ fontSize: '9pt', margin: '0 0 2px', color: '#333' }}>
+                            <strong style={{ textTransform: 'capitalize', color: '#1a1a1a' }}>{cat}:</strong> {items.join(', ')}
+                          </p>
+                        )
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Education */}
+                  {enhanced.education?.length > 0 && (
+                    <div style={{ marginBottom: 10 }}>
+                      <h2 style={{ fontSize: '9pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#1a1a1a', margin: '8px 0 3px', paddingBottom: '1px', borderBottom: '0.5px solid #ccc' }}>Education</h2>
+                      {enhanced.education.map((edu, i) => (
+                        <div key={i} style={{ marginBottom: 4 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                            <span style={{ fontSize: '9.5pt', fontWeight: 700, color: '#1a1a1a' }}>
+                              {edu.degree} <span style={{ fontWeight: 400, fontStyle: 'italic' }}>— {edu.school}</span>
+                            </span>
+                            <span style={{ fontSize: '8pt', color: '#777' }}>{edu.year}</span>
+                          </div>
+                          {edu.gpa || edu.honors ? (
+                            <p style={{ fontSize: '8.5pt', color: '#555', margin: '1px 0' }}>
+                              {edu.gpa ? `GPA: ${edu.gpa}` : ''}{edu.gpa && edu.honors ? ' | ' : ''}{edu.honors ? edu.honors : ''}
+                            </p>
+                          ) : null}
+                          {edu.coursework && (
+                            <p style={{ fontSize: '8.5pt', color: '#555', margin: '1px 0', fontStyle: 'italic' }}>
+                              Relevant Coursework: {typeof edu.coursework === 'string' ? edu.coursework.replace(/^Relevant Coursework:\s*/i, '') : (Array.isArray(edu.coursework) ? edu.coursework.join(', ') : '')}
+                            </p>
+                          )}
                         </div>
-                      )
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
 
-                {/* Education */}
-                {enhanced.education?.length > 0 && (
-                  <div className="resume-section">
-                    <h4 className="resume-heading">Education</h4>
-                    {enhanced.education.map((edu, i) => (
-                      <div key={i} style={{ marginBottom: 6 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                          <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>{edu.degree}</span>
-                          <span style={{ fontSize: '0.68rem', color: 'var(--text-3)' }}>{edu.year}</span>
-                        </div>
-                        <span className="resume-text">{edu.school}{edu.gpa ? ` | GPA: ${edu.gpa}` : ''}{edu.honors ? ` | ${edu.honors}` : ''}</span>
-                        {edu.coursework && (
-                          <div style={{ fontSize: '0.72rem', color: 'var(--text-2)', marginTop: 2, fontStyle: 'italic' }}>Relevant Coursework: {typeof edu.coursework === 'string' ? edu.coursework.replace(/^Relevant Coursework:\s*/i, '') : (typeof edu.coursework === 'object' && edu.coursework ? (Array.isArray(edu.coursework) ? edu.coursework.join(', ') : Object.values(edu.coursework).flat().join(', ')) : '')}</div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  {/* Achievements */}
+                  {enhanced.achievements?.length > 0 && (
+                    <div style={{ marginBottom: 10 }}>
+                      <h2 style={{ fontSize: '9pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#1a1a1a', margin: '8px 0 3px', paddingBottom: '1px', borderBottom: '0.5px solid #ccc' }}>Achievements</h2>
+                      <ul style={{ margin: '1px 0 0 16px', padding: 0, color: '#333' }}>
+                        {enhanced.achievements.map((a, i) => (
+                          <li key={i} style={{ fontSize: '9pt', marginBottom: '1px', listStyleType: 'disc', color: '#333' }}>{a}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
-                {/* Achievements */}
-                {enhanced.achievements?.length > 0 && (
-                  <div className="resume-section">
-                    <h4 className="resume-heading">Achievements</h4>
-                    <ul className="resume-bullets">
-                      {enhanced.achievements.map((a, i) => <li key={i}>{a}</li>)}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Certifications */}
-                {enhanced.certifications?.length > 0 && (
-                  <div className="resume-section">
-                    <h4 className="resume-heading">Certifications</h4>
-                    <ul className="resume-bullets">
-                      {enhanced.certifications.map((cert, i) => <li key={i}>{cert}</li>)}
-                    </ul>
-                  </div>
-                )}
+                  {/* Certifications */}
+                  {enhanced.certifications?.length > 0 && (
+                    <div style={{ marginBottom: 10 }}>
+                      <h2 style={{ fontSize: '9pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#1a1a1a', margin: '8px 0 3px', paddingBottom: '1px', borderBottom: '0.5px solid #ccc' }}>Certifications</h2>
+                      <ul style={{ margin: '1px 0 0 16px', padding: 0, color: '#333' }}>
+                        {enhanced.certifications.map((cert, i) => (
+                          <li key={i} style={{ fontSize: '9pt', marginBottom: '1px', listStyleType: 'disc', color: '#333' }}>{cert}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -535,9 +657,8 @@ export default function ResumeBuilderPage() {
       <div className="page-bg"><div className="orb" /><div className="orb" /><div className="orb" /></div>
       <Illustrations />
       <div className="page-content" style={{ maxWidth: 900, margin: '0 auto', padding: '48px 24px 80px' }}>
-        <a href="/" className="brand" style={{ marginBottom: 48, display: 'inline-flex' }}>
-          <div className="brand-mark" style={{ width: 28, height: 28, borderRadius: 8 }}><svg viewBox="0 0 24 24" style={{ width: 14, height: 14 }}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-          <span className="brand-name" style={{ fontSize: '1.05rem' }}>PrepAIr</span>
+        <a href="/" style={{ marginBottom: 48, display: 'inline-flex', alignItems: 'center' }}>
+          <img src="/logo.png" alt="PrepAIr Logo" style={{ height: 36, width: 'auto' }} />
         </a>
 
         <div style={{ marginBottom: 32, animation: 'fadeInUp 0.6s ease' }}>
@@ -556,7 +677,7 @@ export default function ResumeBuilderPage() {
           ))}
         </div>
 
-        <div className="card" style={{ padding: '36px 40px', animation: 'fadeInUp 0.6s ease 0.3s both' }}>
+        <div className="card card-responsive-padding" style={{ padding: '36px 40px', animation: 'fadeInUp 0.6s ease 0.3s both' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }} className="cfg-grid">
             {/* Upload */}
             <div>

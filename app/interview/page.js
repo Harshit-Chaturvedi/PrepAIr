@@ -392,11 +392,8 @@ export default function InterviewPage() {
       <div className="page-bg-wrap">
         <div className="page-bg"><div className="orb" /><div className="orb" /><div className="orb" /></div>
         <div className="page-content" style={{ maxWidth: 900, margin: '0 auto', padding: '48px 24px 80px' }}>
-          <a href="/" className="brand" style={{ marginBottom: 48, display: 'inline-flex' }}>
-            <div className="brand-mark" style={{ width: 28, height: 28, borderRadius: 8 }}>
-              <svg viewBox="0 0 24 24" style={{ width: 14, height: 14 }}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            </div>
-            <span className="brand-name" style={{ fontSize: '1.05rem' }}>PrepAIr</span>
+          <a href="/" style={{ marginBottom: 48, display: 'inline-flex', alignItems: 'center' }}>
+            <img src="/logo.png" alt="PrepAIr Logo" style={{ height: 36, width: 'auto' }} />
           </a>
           
           <div style={{ marginBottom: 32 }}>
@@ -404,7 +401,7 @@ export default function InterviewPage() {
             <p style={{ fontSize: '0.95rem', color: 'var(--text-2)', maxWidth: 500 }}>Upload your resume and practice with Sarah Mitchell, your AI interviewer.</p>
           </div>
           
-          <div className="card" style={{ padding: '36px 40px' }}>
+          <div className="card card-responsive-padding" style={{ padding: '36px 40px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
               <img src="/interviewer.png" alt="Sarah Mitchell" style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border)' }} />
               <div>
@@ -546,11 +543,8 @@ export default function InterviewPage() {
         <div className="page-bg"><div className="orb" /><div className="orb" /><div className="orb" /></div>
         <div className="page-content" style={{ maxWidth: 1060, margin: '0 auto', padding: '40px 24px 64px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
-            <a href="/" className="brand">
-              <div className="brand-mark" style={{ width: 28, height: 28, borderRadius: 8 }}>
-                <svg viewBox="0 0 24 24" style={{ width: 14, height: 14 }}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              </div>
-              <span className="brand-name" style={{ fontSize: '1.05rem' }}>PrepAIr</span>
+            <a href="/" style={{ display: 'flex', alignItems: 'center' }}>
+              <img src="/logo.png" alt="PrepAIr Logo" style={{ height: 32, width: 'auto' }} />
             </a>
             <a href="/interview" className="btn btn-outline" style={{ textDecoration: 'none', fontSize: '0.78rem' }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
@@ -559,9 +553,26 @@ export default function InterviewPage() {
           </div>
           
           {isLoading ? (
-            <div style={{ textAlign: 'center', padding: '80px 0' }}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2" strokeLinecap="round" className="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-              <h2 style={{ fontSize: '1.3rem', fontWeight: 600, marginTop: 20 }}>Generating your report...</h2>
+            <div style={{ textAlign: 'center', padding: '80px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div className="pulse-ring" style={{ width: 80, height: 80, marginBottom: 24, position: 'relative', borderRadius: '50%' }}>
+                <div style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.02)',
+                  border: '1px solid var(--border)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  zIndex: 1,
+                  padding: 14,
+                  animation: 'pulse 1.5s infinite alternate ease-in-out',
+                }}>
+                  <img src="/logo-mark.png" alt="Loading" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                </div>
+              </div>
+              <h2 style={{ fontSize: '1.3rem', fontWeight: 600, marginTop: 12 }}>Generating your report...</h2>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-2)', marginTop: 8 }}>Sarah is analyzing your interview performance</p>
             </div>
           ) : report ? (
@@ -672,18 +683,15 @@ export default function InterviewPage() {
       <div className="status-bar">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-            <a href="/" className="brand" style={{ fontSize: '1rem' }}>
-              <div className="brand-mark" style={{ width: 28, height: 28, borderRadius: 8 }}>
-                <svg viewBox="0 0 24 24" style={{ width: 14, height: 14 }}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              </div>
-              <span className="brand-name" style={{ fontSize: '1.05rem' }}>PrepAIr</span>
+            <a href="/" style={{ display: 'flex', alignItems: 'center' }}>
+              <img src="/logo.png" alt="PrepAIr Logo" style={{ height: 30, width: 'auto' }} />
             </a>
-            <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
+            <div className="status-bar-sep" style={{ width: 1, height: 20, background: 'var(--border)' }} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <span className={`timer ${timeLeft <= 60 ? 'crit' : timeLeft <= 180 ? 'warn' : ''}`}>{formatTime(timeLeft)}</span>
+              <span className={`timer status-bar-timer ${timeLeft <= 60 ? 'crit' : timeLeft <= 180 ? 'warn' : ''}`}>{formatTime(timeLeft)}</span>
             </div>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-3)' }}>Question {questionNumber} of {totalQs}</span>
+            <span className="status-bar-qcount" style={{ fontSize: '0.78rem', color: 'var(--text-3)' }}>Question {questionNumber} of {totalQs}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div className="live-tag"><span className="ld" />LIVE</div>
@@ -701,9 +709,35 @@ export default function InterviewPage() {
             </div>
             <h3 style={{ fontSize: '1rem', fontWeight: 600, marginTop: 16 }}>Sarah Mitchell</h3>
             <p style={{ fontSize: '0.75rem', color: 'var(--text-3)', marginBottom: 16 }}>Senior Technical Recruiter</p>
-            <div className={`ai-status ${aiState}`}>
-              <span className="ai-dot" />
-              <span>{aiState === 'speaking' ? 'Speaking…' : aiState === 'listening' ? 'Listening…' : aiState === 'processing' ? 'Thinking…' : 'Ready'}</span>
+            <div className={`ai-status ${aiState}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px', borderRadius: '20px', height: '40px', minWidth: '170px', justifyContent: 'center' }}>
+              {aiState === 'speaking' ? (
+                <div className="voice-wave">
+                  <div className="wave-bar" style={{ background: 'var(--green)' }} />
+                  <div className="wave-bar" style={{ background: 'var(--green)' }} />
+                  <div className="wave-bar" style={{ background: 'var(--green)' }} />
+                  <div className="wave-bar" style={{ background: 'var(--green)' }} />
+                  <div className="wave-bar" style={{ background: 'var(--green)' }} />
+                </div>
+              ) : aiState === 'listening' ? (
+                <div className="voice-wave" style={{ opacity: 0.85 }}>
+                  <div className="wave-bar" style={{ background: 'var(--blue)', animationDuration: '1.2s' }} />
+                  <div className="wave-bar" style={{ background: 'var(--blue)', animationDuration: '1.2s', animationDelay: '0.2s' }} />
+                  <div className="wave-bar" style={{ background: 'var(--blue)', animationDuration: '1.2s', animationDelay: '0.4s' }} />
+                  <div className="wave-bar" style={{ background: 'var(--blue)', animationDuration: '1.2s', animationDelay: '0.6s' }} />
+                  <div className="wave-bar" style={{ background: 'var(--blue)', animationDuration: '1.2s', animationDelay: '0.8s' }} />
+                </div>
+              ) : aiState === 'processing' ? (
+                <div style={{ display: 'flex', gap: 4, alignItems: 'center', height: 24, padding: '0 8px' }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--purple)', animation: 'pulse 0.8s infinite alternate' }} />
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--purple)', animation: 'pulse 0.8s infinite alternate 0.2s' }} />
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--purple)', animation: 'pulse 0.8s infinite alternate 0.4s' }} />
+                </div>
+              ) : (
+                <span className="ai-dot" />
+              )}
+              <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>
+                {aiState === 'speaking' ? 'Speaking…' : aiState === 'listening' ? 'Listening…' : aiState === 'processing' ? 'Thinking…' : 'Ready'}
+              </span>
             </div>
             {/* Voice toggle */}
             <button className="voice-toggle" onClick={() => setVoiceEnabled(!voiceEnabled)} title={voiceEnabled ? 'Mute Sarah' : 'Unmute Sarah'}>
@@ -737,9 +771,11 @@ export default function InterviewPage() {
               <div ref={transcriptEndRef} />
             </div>
             {isRecording && (
-              <div className="speech-bar">
-                <span className="sd" />
-                <span>{liveTranscript ? 'Listening...' : 'Speak your answer...'}</span>
+              <div className="speech-bar" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="sd" style={{ width: 6, height: 6, background: liveTranscript.trim() ? 'var(--green)' : 'var(--blue)', borderRadius: '50%', animation: 'pulse 1s infinite alternate', margin: 0 }} />
+                <span style={{ fontWeight: 500 }}>
+                  {liveTranscript.trim() ? 'Listening to your response...' : 'Speak your answer now...'}
+                </span>
               </div>
             )}
           </div>
@@ -748,7 +784,7 @@ export default function InterviewPage() {
       
       {/* Controls */}
       <div className="ctrl">
-        <div style={{ maxWidth: 500, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
+        <div className="ctrl-container" style={{ maxWidth: 500, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
           <button className={`mic-btn ${isRecording && !isMuted ? 'active' : ''} ${isMuted ? 'muted' : ''}`} onClick={() => {
             if (isMuted) { setIsMuted(false); startRecognition(); }
             else { setIsMuted(true); stopRecognition(); }
